@@ -17,11 +17,20 @@
 - [ ] **T-010** — [ação concreta] → `frontend/src/[arquivo]`
 - [ ] **T-011** `[P]` — …
 
+## Testes
+
+Obrigatório: uma task por linha da seção **Testes** do `plan.md`. Feature sem
+estas tasks concluídas não está pronta.
+
+- [ ] **T-080** — `teste('C-001: …')` em `backend/simulator/smoke.mjs`: [o que o assert verifica]
+- [ ] **T-081** — `teste('C-002: …')` em `backend/simulator/smoke.mjs`: [o que o assert verifica]
+- [ ] **T-082** `[P]` — `test('RN-001: …')` em `frontend/tests/<slug>.test.mjs`: [entrada → saída]
+
 ## Verificação
 
-- [ ] **T-090** — `cd frontend && npm run build` passa limpo
-- [ ] **T-091** — Cenário **C-001** da spec reproduzido manualmente: [resultado esperado]
-- [ ] **T-092** — Cenário de erro **C-002** reproduzido: [resultado esperado]
+- [ ] **T-090** — `cd backend && npm test` verde (`sim:check` + `sim:smoke`)
+- [ ] **T-091** — `cd frontend && npm test` verde; `npm run build` e `npm run lint` limpos
+- [ ] **T-092** — Verificação manual da spec reproduzida no simulador: [ex: C-003 — resultado esperado]
 - [ ] **T-093** — Tema claro (`.theme-light`) sem cor quebrada
 
 ## Dependências
@@ -29,12 +38,15 @@
 ```
 T-001 → T-002 → T-010
 T-011 [P] independente
+T-002 → T-080 · T-010 → T-082
 ```
 
 ## Rastreabilidade
 
-Toda task existe por causa de um requisito. Requisito sem task é escopo perdido.
+Toda task existe por causa de um requisito. Requisito sem task é escopo perdido;
+cenário sem task de teste é cenário não entregue.
 
-| Requisito | Tasks |
-|---|---|
-| RF-001 | T-001, T-010 |
+| Requisito / cenário | Tasks | Teste |
+|---|---|---|
+| RF-001 / C-001 | T-001, T-010 | T-080 |
+| RN-001 | T-011 | T-082 |

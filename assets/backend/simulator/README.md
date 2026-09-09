@@ -19,10 +19,16 @@ que vive inteira em `mysql-dialect.mjs`.
 ## Uso
 
 ```bash
+cd backend && npm test            # sim:check + sim:smoke — obrigatorio antes de marcar task ou publicar
 cd backend && npm run sim:check   # as funcoes SQL de leitura rodam?
+cd backend && npm run sim:smoke   # o fluxo faz a coisa certa? SFs reais + assert por cenario da spec
 cd backend && npm run sim:seed    # regera o banco do zero
 cd backend && npm run sim         # sobe o servidor em http://localhost:<PORTA>
 ```
+
+`smoke.mjs` e a suite de testes do backend: cada cenario C-00N e regra RN-00N
+da spec tem um `teste()` com o id no titulo. Sem ele verde, a feature nao esta
+pronta.
 
 Com o simulador no ar, `cd frontend && npm run dev`. Sem `VITE_MITRA_AUTH_URL`
 no `.env` do frontend, o app entra em modo local sozinho.

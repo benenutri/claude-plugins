@@ -20,10 +20,11 @@ usuário pedir para "subir", "publicar", "mandar pro Mitra", "colocar em produç
 
 ### 0. Antes de subir
 
-- `cd frontend && npm run build` limpo (o `tsc -b` reprova erro de tipo) e
-  `npm run lint`.
-- `cd backend && npm run sim:check` verde; fluxo alterado aberto no simulador
-  (ou `sim:smoke` passando).
+- `cd backend && npm test` verde (`sim:check` + `sim:smoke`, com um `teste()`
+  por cenário da spec) — sem isso não publica.
+- `cd frontend && npm test` verde, `npm run build` limpo (o `tsc -b` reprova
+  erro de tipo) e `npm run lint`.
+- O que teste não cobre (layout, tema, navegação) aberto no simulador.
 - Cada SF nova está em `add-NNN-*.mjs` (exporta `definitions`) **e** em
   `SERVER_FUNCTION_NAMES`; tabela/coluna nova está no `setup-backend.mjs` (e,
   se for coluna em tabela existente, num `ALTER TABLE` idempotente no `add-*`).

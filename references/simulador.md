@@ -35,6 +35,7 @@ em fonte de falso positivo.
 | `schema.mjs` | lê DDL dos arquivos em `DDL_SOURCES` e traduz para SQLite | não |
 | `mysql-dialect.mjs` | funções MySQL registradas no SQLite + reescritas sintáticas | só quando o SQL usa algo novo |
 | `check.mjs` | roda todas as SFs SQL de leitura com `CHECK_INPUT` | não |
+| `smoke.mjs` | **a suíte de testes do backend**: SFs reais em banco descartável + `assert` por cenário da spec | **sim — os `teste()`** |
 | `seed-cli.mjs` | regera o banco | não |
 | `README.md` | logins, portas, endpoints | sim (texto) |
 
@@ -43,7 +44,8 @@ Requer Node 22.5+ (`node:sqlite`). Sem dependência npm além do que o backend j
 ## Instalar num projeto
 
 1. Copie `assets/backend/simulator/` para `backend/simulator/` e os scripts
-   `sim`, `sim:seed`, `sim:check` para `backend/package.json`.
+   `sim`, `sim:seed`, `sim:check`, `sim:smoke` e `test` para
+   `backend/package.json`.
 2. Edite `config.mjs`: `PROJECT_LABEL`, `SEED` (= NNNNN), `PORT` (próxima
    livre — ver `estrutura-projeto.md`), `PUBLISH_ORDER` (todos os `add-*.mjs`
    na ordem de publicação), `DDL_SOURCES` (setup + qualquer `add-*` que crie
@@ -60,7 +62,9 @@ Requer Node 22.5+ (`node:sqlite`). Sem dependência npm além do que o backend j
    uma `LoginPage` que, em `MODO_LOCAL`, mostra e-mail/senha e chama
    `loginLocally()`.
 7. `cd backend && npm run sim:check` → deve terminar sem `FALHOU`.
-8. Registre no `mitra-hub/server.mjs`, adicione `.claude/launch.json` e a
+8. Troque os `teste()` de exemplo do `smoke.mjs` pelos cenários da spec (ver
+   seção abaixo); `cd backend && npm test` verde.
+9. Registre no `mitra-hub/server.mjs`, adicione `.claude/launch.json` e a
    entrada no `.gitignore` (`backend/simulator/data/`).
 
 ## Ao adicionar uma spec
@@ -70,6 +74,8 @@ Requer Node 22.5+ (`node:sqlite`). Sem dependência npm além do que o backend j
   `SERVER_FUNCTIONS`.
 - Parâmetro novo de leitura → `CHECK_INPUT`.
 - Cenário novo → registro no `seed.mjs`; `npm run sim:seed` para regerar.
+- Cenário/regra novo → `teste('C-00N: …')` no `smoke.mjs` (obrigatório; é a
+  task T-08x da spec).
 - Função MySQL nova no SQL (`DATE_FORMAT`, `TIMESTAMPDIFF`, `FIELD`,
   `GROUP_CONCAT SEPARATOR`, `CAST AS UNSIGNED`…) → confira se o dialeto cobre;
   se não, adicione shim **com o mesmo significado**.
@@ -77,47 +83,43 @@ Requer Node 22.5+ (`node:sqlite`). Sem dependência npm além do que o backend j
   a coluna também no `CREATE` do setup (o setup é idempotente na plataforma
   porque é `IF NOT EXISTS`, e o ALTER no `add-*` cobre o banco que já existe).
 
-## smoke.mjs (fluxo de escrita ponta a ponta)
+## smoke.mjs — a suíte de testes do backend (obrigatória)
 
-`check.mjs` responde "o SQL roda?". Para "o fluxo faz a coisa certa?" crie
-`simulator/smoke.mjs` por projeto: banco descartável em `tmpdir()`, executa as
-SFs JAVASCRIPT reais e verifica com `assert` o que a spec exige. Esqueleto:
+`check.mjs` responde "o SQL roda?". `smoke.mjs` responde "o fluxo faz a coisa
+certa?": banco descartável em `tmpdir()`, executa as SFs reais (SQL e
+JAVASCRIPT, as mesmas que são publicadas) e verifica com `assert` o que a spec
+exige. Vem pronto no kit (`assets/backend/simulator/smoke.mjs`) com `teste()`
+de exemplo sobre o `add-001-funcoes.mjs`; num projeto, esses exemplos são
+substituídos pelos cenários da spec. `npm test` em `backend/` roda
+`sim:check` e depois `sim:smoke`; qualquer `FALHOU` encerra com código 1.
+
+Regras que fazem o smoke valer como evidência:
+
+- **Um `teste()` por linha da seção Testes do plan.** O título começa com o
+  id do cenário/regra (`'C-002: título vazio é recusado com o motivo'`).
+  É essa rastreabilidade que permite dizer que a spec foi cumprida.
+- **Assert com número e resultado concretos.** `assert.equal(lista.length, 3)`,
+  `assert.match(saida.error, /município/i)` — nunca só "não lançou".
+- **`:VAR_USER` é o `userId` passado ao `execute`**, na ordem de `USUARIOS`
+  do seed. Teste de permissão troca o usuário, nunca o input.
+- **O que o seed não tem, o próprio teste insere** chamando a SF SQL de
+  escrita — assim o cenário fica legível de ponta a ponta.
+- Precisa de uma SF que chama outra por id? Passe `resolveById` ao
+  `createRunner` mapeando o id local de `SERVER_FUNCTIONS` para a definição.
+
+Forma de um teste:
 
 ```js
-import assert from 'node:assert/strict';
-import { DatabaseSync } from 'node:sqlite';
-import { rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { seedDatabase } from './seed.mjs';
-import { registerMysqlFunctions } from './mysql-dialect.mjs';
-import { loadDefinitions, createRunner } from './runtime.mjs';
-
-const DB = join(tmpdir(), 'p-NNNNN-smoke.db');
-rmSync(DB, { force: true });
-seedDatabase(DB, { reset: true });
-const db = new DatabaseSync(DB);
-registerMysqlFunctions(db);
-const { byName } = await loadDefinitions();
-const execute = createRunner(db);
-const USUARIO = 1; // INT_USER.ID → :VAR_USER
-const chamar = (nome, input, userId = USUARIO) => execute(byName.get(nome), input, userId);
-
-let feitos = 0;
-const teste = async (titulo, fn) => { await fn(); feitos += 1; console.log(`  ok  ${titulo}`); };
-
-await teste('C-006: cadastro sem campo obrigatório é recusado com o motivo', async () => {
-  const saida = await chamar('appExemploValidarTitulo', { titulo: '' });
+await teste('C-002: título vazio é recusado com o motivo', async () => {
+  const saida = await chamar('appExemploValidarTitulo', { titulo: '   ' });
   assert.equal(saida.ok, false);
   assert.match(saida.error, /título/i);
 });
-
-console.log(`\n${feitos} verificações passaram.`);
-db.close();
 ```
 
-Cada `teste` cita o cenário/requisito da spec no título — é a rastreabilidade
-que faz o smoke valer como evidência.
+O frontend tem a contraparte em `frontend/tests/*.test.mjs` (`node --test`
+sobre função pura de `src/lib/`), com as mesmas regras de título e de assert
+— veja `estrutura-projeto.md`.
 
 ## Quando a SF fala com banco externo (JDBC ≠ 1) ou integração
 

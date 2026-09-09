@@ -8,7 +8,9 @@
     "sync:function-map": "node sync-server-function-map.mjs",
     "sim": "node simulator/server.mjs",
     "sim:seed": "node simulator/seed-cli.mjs",
-    "sim:check": "node simulator/check.mjs"
+    "sim:check": "node simulator/check.mjs",
+    "sim:smoke": "node simulator/smoke.mjs",
+    "test": "npm run sim:check && npm run sim:smoke"
   },
   "dependencies": {
     "dotenv": "^16.4.7",

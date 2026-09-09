@@ -31,13 +31,13 @@ Uma feature completa é A → C → D → E.
 | `references/estrutura-projeto.md` | anatomia de um repositório `p-NNNNN` (`frontend/` + `backend/`) |
 | `references/simulador.md` | o Mitra em SQLite que roda na sua máquina |
 | `references/publicacao.md` | subir para o sandbox e para produção |
-| `assets/backend/` | `setup-backend.mjs`, `add-NNN-*.mjs` e o simulador completo |
-| `assets/frontend/` | `mitra-api.ts`, `mitra-auth.ts`, `server-functions.ts` |
+| `assets/backend/` | `setup-backend.mjs`, `add-NNN-*.mjs` e o simulador completo, com `smoke.mjs` (a suíte de testes do backend) |
+| `assets/frontend/` | `mitra-api.ts`, `mitra-auth.ts`, `server-functions.ts`, `formato.ts` e `tests/` (`node --test`) |
 | `assets/templates/` | `spec.md`, `plan.md`, `tasks.md` |
 | `assets/env/` | `.env.example` do backend e do frontend |
 | `assets/CLAUDE.md` | convenções que o projeto gerado herda |
 
-## Duas coisas que surpreendem quem chega
+## Três coisas que surpreendem quem chega
 
 **Os scripts do backend não rodam aqui.** `setup-backend.mjs` e os `add-*.mjs`
 são escritos na sua máquina mas executados **no sandbox da plataforma**, porque
@@ -46,6 +46,12 @@ são escritos na sua máquina mas executados **no sandbox da plataforma**, porqu
 **O simulador não reimplementa nada.** Ele carrega as mesmas `definitions` dos
 `add-*.mjs` e o mesmo DDL do setup, em SQLite. É de propósito: bug de SQL
 aparece na sua máquina, não depois de publicar.
+
+**Testes são obrigatórios e nascem na spec.** A spec lista, por cenário, a
+evidência automática exigida; o plan mapeia cada linha para
+`backend/simulator/smoke.mjs` (SFs reais + `assert`) ou `frontend/tests/`
+(`node --test` sobre função pura); as tasks têm uma task por teste. Nada é
+"pronto" nem publica sem `npm test` verde nos dois lados.
 
 ## Como usar
 

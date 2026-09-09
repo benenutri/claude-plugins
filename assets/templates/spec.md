@@ -59,6 +59,27 @@ Conceitos do negócio e como se relacionam — **sem** schema, tipo ou tabela.
 
 - **RN-001** — [ex: lançamento com data futura entra como "pendente"]
 
+## Testes
+
+**Obrigatório.** Todo sistema e toda feature nascem com testes automatizados:
+cenário sem teste é cenário não entregue, e uma spec sem esta seção
+preenchida não é aprovada. Aqui se decide **o quê** precisa de evidência
+automática e com que números; **como** (arquivo, ferramenta) é do `plan.md`.
+
+| Cenário / regra | Evidência automática exigida | Camada |
+|---|---|---|
+| C-001 | [ex: com 3 itens abertos, a listagem devolve 3 e o total é 3] | regra de negócio |
+| C-002 | [ex: título vazio é recusado e a mensagem cita "título"] | regra de negócio |
+| RN-001 | [ex: nascimento 10/03/1958 em 27/08/2026 mostra 68 anos] | regra de tela |
+
+- Cada cenário C-00N e cada regra RN-00N tem pelo menos uma linha.
+- Toda linha tem entrada e resultado concretos; "executa sem erro" não é evidência.
+- **Camada** diz onde a regra mora: *regra de negócio* (o que o sistema grava
+  e devolve) ou *regra de tela* (cálculo, formatação, máscara que a pessoa vê).
+- O que só olho humano verifica (layout, tema, navegação) fica em
+  **Verificação manual**, listado aqui:
+  - [ ] [ex: C-003 — tela em tema claro sem cor quebrada]
+
 ## Fora de escopo
 
 Obrigatório. O que não estiver listado como incluído está excluído.
@@ -77,4 +98,5 @@ Cada item aqui **bloqueia** o `plan.md`.
 - [ ] Todo RF tem critério de aceite verificável
 - [ ] Seção "Fora de escopo" preenchida
 - [ ] Cenários cobrem pelo menos um caminho de erro
+- [ ] Seção "Testes" preenchida: todo C-00N e toda RN-00N com evidência concreta
 - [ ] Zero `[NEEDS CLARIFICATION]` em aberto

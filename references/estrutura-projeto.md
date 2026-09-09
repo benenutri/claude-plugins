@@ -29,25 +29,28 @@ p-NNNNN/
 │   ├── templates/            spec / plan / tasks (assets/templates)
 │   └── specs/NNN-slug/       spec.md · plan.md · tasks.md   ← uma pasta por feature
 ├── backend/
-│   ├── package.json          scripts: setup, publish:NNN, sync:function-map, sim, sim:seed, sim:check
+│   ├── package.json          scripts: setup, publish:NNN, sync:function-map, sim, sim:seed, sim:check, sim:smoke, test
 │   ├── .env.example          chaves vazias (assets/env/backend.env.example)
 │   ├── setup-backend.mjs     schema (CREATE TABLE IF NOT EXISTS) + dados iniciais de negócio
 │   ├── add-NNN-<slug>.mjs    Server Functions da spec NNN — exportam `definitions`
 │   ├── lib/                  fragmentos compartilhados entre scripts (ex.: escritas SQL)
 │   ├── sync-server-function-map.mjs
 │   ├── simulator/            Mitra local (assets/backend/simulator)
+│   │   └── smoke.mjs         OBRIGATÓRIO: suíte do backend — SFs reais + assert por cenário da spec
 │   └── migrations/ + migrations.yaml   GERADOS PELO SISTEMA
 ├── frontend/
-│   ├── package.json          dev / build (tsc -b && vite build) / lint / test
+│   ├── package.json          dev / build (tsc -b && vite build) / lint / test (node --test "tests/**/*.test.mjs")
 │   ├── .env.example          VITE_MITRA_AUTH_URL, VITE_MITRA_PROJECT_ID (+ VITE_MITRA_BASE_URL opcional)
 │   ├── vite.config.ts        base: './', alias @ → src
+│   ├── tests/                OBRIGATÓRIO: <slug>.test.mjs por regra de tela da spec (assets/frontend/tests)
 │   └── src/
 │       ├── App.tsx           rotas; `initMitra()` decide autenticado x /login
 │       ├── index.css         FONTE ÚNICA de cor (tokens em :root ou @theme)
 │       ├── lib/
 │       │   ├── mitra-auth.ts         sessão + init do SDK (modo local x real)
 │       │   ├── mitra-api.ts          linhas() / acao() / comPadrao()
-│       │   └── server-functions.ts   SERVER_FUNCTION_NAMES + SERVER_FUNCTIONS
+│       │   ├── server-functions.ts   SERVER_FUNCTION_NAMES + SERVER_FUNCTIONS
+│       │   └── formato.ts            regra pura (datas, moeda…) — o que tests/ importa
 │       ├── components/ui/    primitivos genéricos (shadcn ajustados ou próprios)
 │       ├── components/page.tsx   vocabulário do produto (Panel, Status, Code…)
 │       ├── components/Logo.tsx   marca do cliente (cor explícita, não herdada do tema)
@@ -69,7 +72,14 @@ features e análises têm lugar em `docs/` — se um fluxo antigo mandar escreve
 ## Frontend — convenções que valem em todos os projetos
 
 - React 19 · TypeScript · Vite 7 · Tailwind 4 · react-router-dom 7 ·
-  lucide-react · recharts · `mitra-interactions-sdk`. Vitest quando há testes.
+  lucide-react · recharts · `mitra-interactions-sdk`.
+- **Testes obrigatórios** em `frontend/tests/*.test.mjs` com `node --test`
+  (`node:test` + `node:assert/strict`; Node 22.18+ importa `.ts` direto, sem
+  vitest nem dependência nova). Testa-se função pura de `src/lib/` —
+  formatação, cálculo, máscara, normalização de linhas do backend. Regra que
+  precisa de teste e está dentro de um componente é extraída para `src/lib/`.
+  Cada `test` cita o cenário/regra da spec no título. Tela não se testa aqui:
+  vai para a verificação manual dos cenários no simulador.
 - `verbatimModuleSyntax`: **não importe `interface`/`type` de outro arquivo**
   (compila e quebra em runtime). Tipo local em cada arquivo.
 - Texto visível em português com acentuação; sem emoji na UI (ícones);
@@ -102,6 +112,10 @@ features e análises têm lugar em `docs/` — se um fluxo antigo mandar escreve
   `listTablesMitra` (idempotente), e a tabela no `setup` ganha a coluna também
   (para projeto novo e para o simulador).
 - Perfil de acesso: script próprio (`add-NNN-perfil-acesso.mjs`).
+- **Testes obrigatórios** em `simulator/smoke.mjs`: executa as SFs reais em
+  banco descartável e faz `assert` do que a spec exige, um `teste()` por
+  cenário/regra com o id no título. `npm test` = `sim:check` + `sim:smoke`.
+  Detalhe em `simulador.md`.
 - `.env` do backend fica **vazio** localmente.
 
 ## Env

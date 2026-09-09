@@ -15,6 +15,7 @@ Preencher **antes** de detalhar o desenho. Falha aqui é replanejamento.
 | Migrations append-only | | [nada em `backend/migrations/` é tocado à mão] |
 | Leitura e escrita por Server Function | | [nenhum `listRecords`/`patchRecord` em tela de usuário final] |
 | Simulador cobre a feature | | [definitions carregadas, seed com os cenários da spec, `sim:check` verde] |
+| Testes automatizados obrigatórios | sim | [cada linha da seção **Testes** da spec vira um `teste()` em `simulator/smoke.mjs` ou um `test()` em `frontend/tests/`; `npm test` verde nos dois lados] |
 | Design tokens, sem cor literal | | [tokens usados; zero hex] |
 | Simplicidade | | [nenhuma abstração com uma implementação só; dependência nova justificada abaixo] |
 
@@ -64,6 +65,27 @@ só por SF SQL.
 - Seed: [quais registros entram em `simulator/seed.mjs` para cobrir C-001…C-00N]
 - `CHECK_INPUT`: [parâmetros novos que o `sim:check` precisa conhecer]
 - Dialeto: [função MySQL nova usada no SQL? precisa de shim em `mysql-dialect.mjs`?]
+
+## Testes
+
+**Obrigatório.** Mapa da seção **Testes** da spec para os arquivos. Linha da
+spec sem linha aqui é plan incompleto; não vai para `tasks.md`.
+
+| Cenário / regra | Arquivo | O que o `assert` verifica |
+|---|---|---|
+| C-001 | `backend/simulator/smoke.mjs` | [SF chamada com quais parâmetros; linhas/saída esperadas, com números] |
+| C-002 | `backend/simulator/smoke.mjs` | [`ok: false` e o motivo que a mensagem precisa conter] |
+| RN-001 | `frontend/tests/<slug>.test.mjs` | [função pura de `src/lib/`: entrada → saída] |
+
+- **Backend:** `smoke.mjs` executa as SFs reais (SQL e JAVASCRIPT) em banco
+  descartável; título de cada `teste()` começa com o id do cenário/regra.
+  `npm test` em `backend/` = `sim:check` + `sim:smoke`.
+- **Frontend:** `node --test` sobre funções puras de `src/lib/` (formatação,
+  cálculo, máscara, normalização das linhas do backend). Regra que hoje mora
+  dentro de um componente e precisa de teste é extraída para `src/lib/`.
+  Tela não se testa aqui: vai para a verificação manual dos cenários.
+- **Seed extra para o smoke:** [registros que os testes precisam e o seed do
+  simulador não tem, ou "nenhum"]
 
 ## Decisões
 
