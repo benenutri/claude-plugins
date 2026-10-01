@@ -8,17 +8,12 @@
   },
   "plugins": [
     {
-      "name": "mitra-escopo",
-      "description": "Escopa, estrutura, desenvolve localmente e publica projetos na plataforma Mitra.",
-      "source": { "source": "url", "url": "https://github.com/benenutri/mitra-escopo.git" },
-      "strict": false,
-      "skills": ["./"],
-      "category": "development"
-    },
-    {
       "name": "benenutri",
-      "description": "Design system, marca e convenções visuais da Benenutri (skill benenutri:design).",
-      "source": { "source": "url", "url": "https://github.com/benenutri/design-system.git" },
+      "description": "Skills da Benenutri para os projetos Mitra: benenutri:design e benenutri:mitra-escopo.",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/benenutri/design-system.git"
+      },
       "category": "design"
     }
   ]
