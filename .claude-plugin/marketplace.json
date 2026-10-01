@@ -1,0 +1,25 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "benenutri",
+  "description": "Plugins de Claude Code da Benenutri para os projetos Mitra.",
+  "owner": {
+    "name": "Benenutri",
+    "url": "https://github.com/benenutri"
+  },
+  "plugins": [
+    {
+      "name": "mitra-escopo",
+      "description": "Escopa, estrutura, desenvolve localmente e publica projetos na plataforma Mitra.",
+      "source": { "source": "url", "url": "https://github.com/benenutri/mitra-escopo.git" },
+      "strict": false,
+      "skills": ["./"],
+      "category": "development"
+    },
+    {
+      "name": "benenutri",
+      "description": "Design system, marca e convenções visuais da Benenutri (skill benenutri:design).",
+      "source": { "source": "url", "url": "https://github.com/benenutri/design-system.git" },
+      "category": "design"
+    }
+  ]
+}
