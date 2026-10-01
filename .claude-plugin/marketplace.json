@@ -10,11 +10,8 @@
     {
       "name": "benenutri",
       "description": "Skills da Benenutri para os projetos Mitra: benenutri:design e benenutri:mitra-escopo.",
-      "source": {
-        "source": "url",
-        "url": "https://github.com/benenutri/design-system.git"
-      },
-      "category": "design"
+      "source": "./",
+      "category": "development"
     }
   ]
 }
