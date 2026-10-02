@@ -342,6 +342,56 @@
   overflow: hidden;
 }
 
+/* Marca em movimento — design.md §11.1. Dois lugares e só dois: o monograma do
+   menu recolhido monta uma vez (`<Monogram animar="monta">`) e o carregamento
+   da tela repete o ciclo (`<MonogramLoader>`). As unidades são as do viewBox
+   do monograma (757,5 × 663): 700px tira o B inteiro por baixo e o SVG corta
+   o que passa da borda. O estado final de cada animação é a marca inteira,
+   então com "reduzir movimento" (abaixo) ela aparece pronta. */
+.bn-monta .bn-b {
+  animation: bn-brota 600ms cubic-bezier(0.2, 0.8, 0.2, 1) 100ms both;
+}
+.bn-monta .bn-n {
+  animation: bn-cai 760ms linear 300ms both;
+}
+.bn-carrega .bn-b {
+  animation: bn-carrega-b 1500ms cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+.bn-carrega .bn-n {
+  animation: bn-carrega-n 1500ms cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+/* Espera curta não pisca a marca: o carregando só aparece depois de 400 ms. */
+.bn-carregando {
+  animation: bn-aparece 160ms ease-out 400ms both;
+}
+@keyframes bn-brota {
+  from { transform: translateY(700px); }
+  to { transform: none; }
+}
+/* O N cai e quica duas vezes: cada trecho acelera na queda e freia na subida. */
+@keyframes bn-cai {
+  0% { transform: translateY(-900px); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+  50% { transform: none; animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1); }
+  68% { transform: translateY(-150px); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+  83% { transform: none; animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1); }
+  92% { transform: translateY(-40px); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+  100% { transform: none; }
+}
+@keyframes bn-carrega-b {
+  0% { transform: translateY(700px); opacity: 1; }
+  30%, 82% { transform: none; opacity: 1; }
+  100% { transform: none; opacity: 0; }
+}
+@keyframes bn-carrega-n {
+  0%, 14% { transform: translateY(-900px); opacity: 1; }
+  44%, 82% { transform: none; opacity: 1; }
+  100% { transform: none; opacity: 0; }
+}
+@keyframes bn-aparece {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

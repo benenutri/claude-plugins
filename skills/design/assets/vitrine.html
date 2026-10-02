@@ -445,7 +445,32 @@
   .conteudo { padding: 18px 20px; background: var(--background); }
   @media (max-width: 640px) { .layout-sample { grid-template-columns: 1fr; } .nav { flex-direction: row; flex-wrap: wrap; } .nav .rodape { margin-top: 0; border: 0; } .tipo > div { grid-template-columns: 1fr; gap: 4px; } }
 
-  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  /* ═══ Marca em movimento (design.md §11.1) — cópia do bloco .bn-* do index.css ═══ */
+  .bn-monta .bn-b { animation: bn-brota 600ms cubic-bezier(.2, .8, .2, 1) 100ms both; }
+  .bn-monta .bn-n { animation: bn-cai 760ms linear 300ms both; }
+  .bn-carrega .bn-b { animation: bn-carrega-b 1500ms cubic-bezier(.2, .8, .2, 1) infinite; }
+  .bn-carrega .bn-n { animation: bn-carrega-n 1500ms cubic-bezier(.2, .8, .2, 1) infinite; }
+  .bn-carregando { animation: bn-aparece 160ms ease-out 400ms both; }
+  @keyframes bn-brota { from { transform: translateY(700px); } to { transform: none; } }
+  @keyframes bn-cai {
+    0% { transform: translateY(-900px); animation-timing-function: cubic-bezier(.55, 0, 1, .45); }
+    50% { transform: none; animation-timing-function: cubic-bezier(0, .55, .45, 1); }
+    68% { transform: translateY(-150px); animation-timing-function: cubic-bezier(.55, 0, 1, .45); }
+    83% { transform: none; animation-timing-function: cubic-bezier(0, .55, .45, 1); }
+    92% { transform: translateY(-40px); animation-timing-function: cubic-bezier(.55, 0, 1, .45); }
+    100% { transform: none; }
+  }
+  @keyframes bn-carrega-b { 0% { transform: translateY(700px); opacity: 1; } 30%, 82% { transform: none; opacity: 1; } 100% { transform: none; opacity: 0; } }
+  @keyframes bn-carrega-n { 0%, 14% { transform: translateY(-900px); opacity: 1; } 44%, 82% { transform: none; opacity: 1; } 100% { transform: none; opacity: 0; } }
+  @keyframes bn-aparece { from { opacity: 0; } to { opacity: 1; } }
+  .marca .carregando { display: grid; justify-items: center; gap: 8px; font-size: 12px; color: var(--muted-foreground); }
+  .marca .carregando svg.mono { height: 30px; }
+  .marca .legenda .btn { justify-self: start; margin-top: 6px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+    .bn-b, .bn-n, .bn-carregando { animation: none !important; }
+  }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -865,6 +890,8 @@
       <div class="card"><div class="amostra" style="background:var(--primary);color:var(--primary-foreground)"><svg class="mono"><use href="#bn"/></svg></div><div class="legenda"><b>Monograma sobre primary</b><span>avatar e menu recolhido · herda <code>currentColor</code></span></div></div>
       <div class="card"><div class="amostra" style="background:var(--accent);color:var(--mark-on-accent)"><svg class="mono"><use href="#bn"/></svg></div><div class="legenda"><b>Monograma sobre accent</b><span>login · verde da marca no claro, <code>accent-foreground</code> no escuro</span></div></div>
       <div class="card"><div class="amostra" style="background:var(--muted)"><svg width="40" height="40" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#156b16"/><g fill="#fff" style="color:#fff" transform="translate(6 7.25) scale(0.026403)"><use href="#bn" width="757.5" height="663.06"/></g></svg></div><div class="legenda"><b>Favicon</b><span>monograma branco sobre <code>#156b16</code> · não muda com o tema</span></div></div>
+      <div class="card"><div class="amostra brand" style="background:var(--card)"><span data-bn="monta"></span></div><div class="legenda"><b>Menu recolhido</b><span><code>&lt;Monogram animar="monta" /&gt;</code> · monta uma vez ao entrar no lugar da assinatura (§11.1)</span><button type="button" class="btn btn-secondary btn-sm" id="bn-repetir">Repetir</button></div></div>
+      <div class="card"><div class="amostra" style="background:var(--background)"><div class="carregando bn-carregando" role="status"><span class="brand" data-bn="carrega"></span>Carregando pedidos</div></div><div class="legenda"><b>Carregamento da tela</b><span><code>&lt;MonogramLoader /&gt;</code> · ciclo de 1,5 s, aparece só depois de 400 ms (§11.1)</span></div></div>
     </div>
   </section>
 
@@ -1154,6 +1181,20 @@
         if (b.dataset.altura !== 'padrao') quadro.classList.add(b.dataset.altura);
         botoes.forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
       });
+    });
+  })();
+
+  /* Marca em movimento (design.md §11.1): o B e o N viram dois <path> do mesmo
+     SVG para cada um ter a sua animação; o repetir troca o SVG por uma cópia. */
+  (function () {
+    var paths = document.querySelectorAll('#bn path');
+    document.querySelectorAll('[data-bn]').forEach(function (el) {
+      el.innerHTML = '<svg class="mono bn-' + el.dataset.bn + '" viewBox="0 0 757.5 663.06" fill="currentColor" role="img" aria-label="BENENUTRI">' +
+        '<path class="bn-b" d="' + paths[0].getAttribute('d') + '"/><path class="bn-n" d="' + paths[1].getAttribute('d') + '"/></svg>';
+    });
+    document.getElementById('bn-repetir').addEventListener('click', function () {
+      var svg = document.querySelector('[data-bn="monta"] svg');
+      svg.replaceWith(svg.cloneNode(true));
     });
   })();
 </script>

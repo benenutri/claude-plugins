@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "benenutri",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Skills da Benenutri para os projetos Mitra (p-NNNNN): design (design system, marca e convenções visuais) e mitra-escopo (escopar, desenvolver localmente e publicar na plataforma Mitra).",
   "author": {
     "name": "Isaac Portela"

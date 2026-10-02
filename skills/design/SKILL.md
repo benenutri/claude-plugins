@@ -1,6 +1,6 @@
 ---
 name: design
-description: Design system oficial da Benenutri para os projetos Mitra (p-NNNNN): tokens de cor e tipografia (Manrope + Work Sans, verde #156b16), marca (logos, monograma, favicon), primitivos shadcn já ajustados, vocabulário de tela (PageHeader, Panel, Toolbar, SelectMenu, Status, Table, Pagination, Board, PainelGrafico, Kpi), a rampa de dados para gráfico e os anti-padrões que reprovam revisão. Use SEMPRE que, num projeto da Benenutri, o pedido envolver tela, página, layout, componente, formulário, tabela, quadro, kanban, filtro, diálogo, gráfico, painel, dashboard, KPI, indicador visual, BI, cor de série, cor, tema, fonte, logo, favicon, "design system", shadcn, recharts, Tailwind, "deixar bonito", "padronizar visual", revisar UI, ou instalar/portar o padrão visual num projeto novo — mesmo que o usuário não diga "design".
+description: Design system oficial da Benenutri para os projetos Mitra (p-NNNNN): tokens de cor e tipografia (Manrope + Work Sans, verde #156b16), marca (logos, monograma, favicon, monograma animado no carregamento e no menu recolhido), primitivos shadcn já ajustados, vocabulário de tela (PageHeader, Panel, Toolbar, SelectMenu, Status, Table, Pagination, Board, PainelGrafico, Kpi), a rampa de dados para gráfico e os anti-padrões que reprovam revisão. Use SEMPRE que, num projeto da Benenutri, o pedido envolver tela, página, layout, componente, formulário, tabela, quadro, kanban, filtro, diálogo, gráfico, painel, dashboard, KPI, indicador visual, BI, cor de série, cor, tema, fonte, logo, logo animado, carregamento, favicon, "design system", shadcn, recharts, Tailwind, "deixar bonito", "padronizar visual", revisar UI, ou instalar/portar o padrão visual num projeto novo — mesmo que o usuário não diga "design".
 ---
 
 # Design system Benenutri
@@ -26,7 +26,7 @@ o kit.
 | "quadro", "kanban", "coluna por etapa", "arrastar cartão" | **Construir** | `design.md` §8.5 e §9.6 |
 | "gráfico", "painel", "dashboard", "KPI", "indicador", "BI", "cor de série" | **Construir** | `design.md` §12, §8.7 e §9.7 — e o skill `dataviz` para a forma |
 | "revisa a UI", "está fora do padrão?", PR com telas | **Revisar** | `design.md` §5, §14 (anti-padrões) |
-| logo, favicon, cor da marca, tela de login | **Marca** | `design.md` §10.1, §11 |
+| logo, favicon, cor da marca, tela de login, carregamento, logo animado | **Marca** | `design.md` §10.1, §11, §11.1 |
 | "modo escuro", "dark mode", "tema", "cor nova", "está estourando no escuro" | **Tema escuro** | `design.md` §2.1, `assets/README.md` |
 | "e-mail", "notificação por e-mail", "aviso", automação que manda e-mail, "assunto", "template de e-mail", "mandar para o fornecedor" | **E-mail** | `design.md` §15, `assets/email.html` |
 
@@ -222,7 +222,8 @@ Contraste mínimo de texto e ícone: 4,5:1 sobre branco.
 | Peça | Arquivo | Cor | Uso |
 |---|---|---|---|
 | Assinatura | `logo-benenutri.png` via `<Wordmark />` | `#45963d` (no PNG) | menu expandido, barra mobile, login |
-| Monograma BN | inline em `Logo.tsx` (`<Monogram />`); `logo-bn.svg` fora do React | `currentColor` | menu recolhido, login, avatar |
+| Monograma BN | inline em `Logo.tsx` (`<Monogram />`, `animar`); `logo-bn.svg` fora do React | `currentColor` | menu recolhido (anima), login, avatar |
+| Carregamento | `<MonogramLoader />` em `Logo.tsx` | `text-brand-mark` | área de conteúdo esperando dado (anima) |
 | Favicon | `favicon.svg` | branco sobre `#156b16` | aba |
 
 Tela de login (§10.1): duas metades em `lg`; à esquerda assinatura, manchete
@@ -241,6 +242,15 @@ e recusam no envio — tela que não abre em desenvolvimento não é revisada.
 
 A assinatura é `w-fit`. Com `w-auto` numa coluna flex o `align-items: stretch`
 a deforma para a largura da coluna, e isso chega como "o logo está errado".
+
+**Marca em movimento (§11.1)**: o monograma do GIF da marca (B brota, N cai e
+quica) anima em **dois lugares e só neles**. No menu recolhido,
+`<Monogram animar="monta" />` monta uma vez (o `AdminLayout` já usa). No
+carregamento da área de conteúdo inteira (primeira carga, troca de rota),
+`<MonogramLoader rotulo="Carregando pedidos" />` repete o ciclo e só aparece
+depois de 400 ms, atraso que já está no CSS. Dentro de painel e gráfico o
+carregando continua sendo esqueleto. Abertura, login e cabeçalho ficam parados.
+Na tela é sempre o SVG; o GIF é para apresentação.
 
 ## Outra marca (projeto fora da Benenutri)
 
@@ -276,7 +286,7 @@ tocado por este plugin. Fluxo completo de SYNC/SHARE na skill `mitra-escopo`.
 
 | Quando | Abra |
 |---|---|
-| Qualquer decisão visual | `assets/design.md` (índice: §1 stack · §2 tokens · §3 apelidos · §4 tipografia · §5 cores · §6 forma · §7 primitivos · §8 vocabulário (8.5 quadro · 8.6 tabela · 8.7 gráficos) · §9 padrões de tela (9.1 tabela · 9.5 diálogo · 9.6 quadro · 9.7 painel) · §10 layout e login · §11 marca · §12 gráficos e BI (12.1 lib · 12.2 cor · 12.3 o que não se faz) · §13 movimento/acessibilidade · §14 checklist e anti-padrões · §15 e-mail) |
+| Qualquer decisão visual | `assets/design.md` (índice: §1 stack · §2 tokens · §3 apelidos · §4 tipografia · §5 cores · §6 forma · §7 primitivos · §8 vocabulário (8.5 quadro · 8.6 tabela · 8.7 gráficos) · §9 padrões de tela (9.1 tabela · 9.5 diálogo · 9.6 quadro · 9.7 painel) · §10 layout e login · §11 marca (11.1 marca em movimento) · §12 gráficos e BI (12.1 lib · 12.2 cor · 12.3 o que não se faz) · §13 movimento/acessibilidade · §14 checklist e anti-padrões · §15 e-mail) |
 | Copiar arquivos, dependências | `assets/README.md` |
 | Processo (spec antes de código, migrations, tokens) | `assets/constitution.md` |
 | Implementação de referência viva | `mitra-projects/p-57803/frontend/src` |

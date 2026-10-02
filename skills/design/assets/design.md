@@ -17,6 +17,11 @@ painel operacional: densidade alta, ruído baixo, nada decorativo.
 Regra de ouro herdada: **onde este documento e o código divergirem, um dos dois
 está errado — descubra qual antes de mudar qualquer coisa.**
 
+> **Marca em movimento adicionada em 2026-10-02** (§11.1): o monograma monta
+> (B brota, N cai e quica) só no menu recolhido e no carregamento da tela,
+> pelo `animar` do `Monogram` e pelo `MonogramLoader` novo do `Logo.tsx`. O §13
+> ganhou essa exceção; nenhum outro componente mudou.
+>
 > **E-mail adicionado em 2026-09-24** (§15): o modelo transacional — marca,
 > sistema, título em frase, blocos opcionais, um botão, rodapé com o motivo —
 > com os tokens em hex e a implementação única no motor da
@@ -1210,6 +1215,41 @@ só como "o logo está errado". `fit-content` não é `auto`, então o stretch n
 a alcança, e em `flex-row` nada muda. Vale para qualquer `<img>` de largura
 intrínseca posto numa coluna flex.
 
+### 11.1 Marca em movimento
+
+O monograma tem um movimento só, o do GIF da marca: o **B brota de baixo** e o
+**N cai de cima e quica**. Ele aparece em **dois lugares, e só neles**:
+
+| Lugar | Como | Quando roda | Duração |
+| --- | --- | --- | --- |
+| Menu recolhido | `<Monogram animar="monta" />` no topo do menu (`AdminLayout`) | uma vez, quando o monograma entra no lugar da assinatura (ao recolher, ou ao abrir a tela com o menu já recolhido) | 1,1 s |
+| Carregamento da tela | `<MonogramLoader rotulo="Carregando pedidos" />` na área de conteúdo | em ciclo, enquanto a primeira carga ou a troca de rota espera dado; aparece só depois de **400 ms** | ciclo de 1,5 s |
+
+As regras:
+
+- **Abertura, login, cabeçalho e e-mail ficam parados.** A marca que se move
+  em todo lugar vira enfeite, e o §13 proíbe enfeite.
+- O `MonogramLoader` é da **área de conteúdo inteira**. Dentro de painel,
+  tabela e gráfico, buscar continua sendo esqueleto na altura final (§9.7) —
+  trocar o esqueleto pela marca faz a tela pular quando o dado chega.
+- O atraso de 400 ms mora no CSS (`.bn-carregando`): monte o componente no
+  instante em que a busca começa. Resposta rápida troca a tela sem piscar a
+  marca, e nenhuma tela precisa de `setTimeout` para isso.
+- O carregando **diz o que carrega** (`rotulo`), em `role="status"`: o leitor
+  de tela não vê o monograma se montar.
+- A cor não muda com o movimento: monograma no verde da marca (`text-brand-mark`)
+  no carregamento, `BRAND_GREEN` no menu.
+- Com "reduzir movimento" a marca aparece pronta: o estado final de cada
+  animação é o monograma inteiro, e o bloco `prefers-reduced-motion` do
+  `index.css` zera a duração.
+
+A animação mora no `index.css` (classes `.bn-*`, keyframes `bn-brota`,
+`bn-cai`, `bn-carrega-b`, `bn-carrega-n`, `bn-aparece`) e o B e o N são dois
+`<path>` do mesmo SVG. O quadro do SVG corta o que passa da borda, então não há
+`clipPath`. O GIF (800×400, monograma branco sobre `#156b16` e assinatura) é
+peça de apresentação e e-mail; na tela, a marca é sempre o SVG, que segue o
+tema e o "reduzir movimento".
+
 ---
 
 ## 12. Gráficos
@@ -1362,7 +1402,8 @@ color: var(--background);
 - **Animação só onde ela explica alguma coisa**: a sanfona (`.collapsible`,
   `0fr → 1fr`), a entrada de popover/diálogo pelo `tw-animate-css` e
   transições de cor em hover. Nada de entrada animada de página, brilho ou
-  deslocamento decorativo.
+  deslocamento decorativo. A única exceção é a marca, e só no menu recolhido
+  e no carregamento da tela (§11.1).
 - `prefers-reduced-motion: reduce` zera duração de animação e transição.
 - Foco visível é garantido globalmente por `:focus-visible` em `--ring`, além
   do anel próprio de cada componente.
@@ -1425,6 +1466,9 @@ color: var(--background);
 - `<img>` de largura intrínseca com `w-auto` dentro de um `flex-col`: o
   `align-items: stretch` deforma a imagem para a largura da coluna. É `w-fit`
   (§11) — foi assim que a assinatura foi parar esticada na tela de login.
+- Marca animada fora do menu recolhido e do carregamento da tela (abertura,
+  login, cabeçalho, botão); `MonogramLoader` no lugar do esqueleto dentro de
+  painel ou gráfico; spinner genérico onde a tela inteira carrega (§11.1).
 - `maxLength` num campo que filtra o valor no `onChange` (código de 6 dígitos):
   o atributo conta os caracteres sujos do DOM e engole dígitos bons (§10.1).
 - **Dois eixos Y** no mesmo gráfico (§12.3). Reprova sozinho.

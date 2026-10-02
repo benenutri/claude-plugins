@@ -116,9 +116,10 @@ export default function AdminLayout({
       >
         {fechado ? (
           // Verde da MARCA (nao o --primary da interface): recolhido ou aberto,
-          // o menu mostra a mesma cor da assinatura completa.
+          // o menu mostra a mesma cor da assinatura completa. O monograma monta
+          // uma vez ao entrar no lugar da assinatura (design.md §11.1).
           <span style={{ color: BRAND_GREEN }}>
-            <Monogram className="size-7" />
+            <Monogram animar="monta" className="size-7" />
           </span>
         ) : (
           <>
