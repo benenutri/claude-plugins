@@ -113,6 +113,48 @@ constitution, não `npm i`.
   com contraste medido ao vivo, componentes, listagem, login e marca, com o
   seletor claro / escuro / sistema.
 
+### Tema sincronizado com o Painel Benenutri (obrigatório em todo sistema)
+
+Os sistemas da Benenutri abrem dentro do Painel Benenutri, numa aba (iframe).
+O modo claro/escuro do sistema tem de andar junto com o do painel, nos dois
+sentidos. O painel já faz a parte dele e não muda:
+
+- abre o sistema com o tema no endereço: `?tema=dark` ou `?tema=light` (no
+  login único, `/sso?ticket=...&tema=...`);
+- quando o tema muda no painel, manda ao iframe:
+  `postMessage({ tipo: 'mitra-tema', tema: 'dark' | 'light' })`;
+- escuta do iframe a mesma mensagem e, quando chega uma, adota o tema e
+  repassa aos outros sistemas abertos.
+
+Todo sistema gerado DEVE:
+
+1. Ter modo claro e escuro, com um botão de alternar (`ThemeToggle`), e
+   guardar a escolha (`localStorage`) para que ela valha entre as telas.
+2. Ao carregar qualquer tela, se vier `?tema=dark|light` no endereço, aplicar
+   esse tema antes de desenhar a tela (sem piscar — é o script inline do
+   `index.html` que lê o parâmetro) e gravar como preferência.
+3. Se tiver login único (rota `/sso`), manter o parâmetro `tema` no
+   redirecionamento depois de validar o ticket.
+4. Na primeira carga dentro do iframe, guardar a origem do painel (origem de
+   `document.referrer`) em `sessionStorage`, porque o referrer se perde ao
+   navegar dentro do sistema.
+5. Escutar `window` `'message'` e aceitar só mensagens com `e.origin` igual à
+   origem guardada do painel e `e.data = { tipo: 'mitra-tema', tema: 'dark' |
+   'light' }`. Aplicar na hora, sem recarregar.
+6. No botão de tema do sistema: além de trocar localmente, se estiver dentro
+   de um iframe (`window.parent !== window`), enviar
+   `window.parent.postMessage({ tipo: 'mitra-tema', tema }, origemDoPainel)`.
+7. Não devolver mensagem ao painel quando o tema aplicado veio dele (evita
+   laço).
+8. Fora do painel (sistema aberto direto), funcionar normalmente com o próprio
+   botão e a preferência salva.
+9. Centralizar isso num módulo único de tema — o `lib/theme.ts` do kit, usado
+   por todas as telas — em vez de espalhar pelo código.
+
+Critério de pronto de todo sistema novo: aberto pelo painel com o painel
+escuro, já abre escuro; trocar no painel troca no sistema na hora; trocar no
+sistema troca no painel e nos outros sistemas abertos.
+
 ## Gráficos e BI
 
 - **Divisão de trabalho:** *que forma usar* (é gráfico mesmo? magnitude ou
