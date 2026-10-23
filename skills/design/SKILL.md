@@ -96,7 +96,11 @@ constitution, não `npm i`.
 - Instalar num projeto que já tem o kit claro: copie o bloco `.dark` do
   `assets/index.css` (logo após o `:root`), atualize o comentário do
   `@custom-variant dark`, adicione `lib/theme.ts`, `ThemeToggle.tsx` (rodapé do
-  menu, ao lado de "Sair") e o script inline do `index.html`.
+  menu, ao lado de "Sair") e o script inline do `index.html`. Esses três já
+  trazem a sincronia com o Painel Benenutri (subseção abaixo): nada a escrever
+  por projeto além de `manterTema(destino)` no redirecionamento da rota `/sso`
+  e, se a tela de login precisar seguir o painel, um `escutarPainel()` no
+  `main.tsx`.
 - Ao revisar: todo token de `:root` tem par em `.dark`? Algum componente usa
   `text-white`/`bg-white`/hex? (só o botão destrutivo usa `text-white`, e a
   paleta escura foi escolhida para ele passar). Contraste mínimo 4,5:1 nos dois

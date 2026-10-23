@@ -19,7 +19,7 @@ Leia o §14 dele antes de portar; este README só diz **o que copiar para onde**
 | `vite.config.ts` | `frontend/vite.config.ts` | plugin Tailwind 4, `base: './'`, alias `@` |
 | `tsconfig.json`, `tsconfig.app.json` | `frontend/` | alias `@/*` nos **dois** (o CLI do shadcn lê o raiz) |
 | `lib/utils.ts` | `frontend/src/lib/utils.ts` | `cn()` |
-| `lib/theme.ts` | `frontend/src/lib/theme.ts` | tema claro/escuro/sistema: `getTheme`, `setTheme`, `toggleTheme`, `applyTheme`, `watchSystemTheme` (§2.1) |
+| `lib/theme.ts` | `frontend/src/lib/theme.ts` | tema claro/escuro/sistema: `getTheme`, `setTheme`, `toggleTheme`, `applyTheme`, `watchSystemTheme` (§2.1); sincronia com o Painel Benenutri: `escutarPainel`, `origemDoPainel`, `manterTema` (SKILL.md, "Tema sincronizado") |
 | `components/ThemeToggle.tsx` | `frontend/src/components/ThemeToggle.tsx` | botão Sol/Lua sobre `IconButton`, em tom neutro; **já montado** no rodapé do `AdminLayout` de exemplo |
 | `components/ui/*.tsx` | `frontend/src/components/ui/` | primitivos shadcn **já ajustados** (§7). Não rode `npx shadcn add` por cima sem reaplicar o diff |
 | `components/page.tsx` | `frontend/src/components/page.tsx` | vocabulário do produto (§8): `PageHeader`, `Panel`, `Toolbar`, `SelectMenu`, `Status`, `Table`, `Pagination`, `Board`/`BoardColumn`/`BoardCard`, e o bloco 8.7 de BI (`Kpi`, `Delta`, `Sparkline`, `PainelGrafico`, `corDeSerie`, `tomDeIntensidade`). `EtiquetaLista` e `CheckRow` são do CRM: apague se a spec não pedir; sem gráfico, apague o bloco 8.7 e o reexport de `ui/chart` |
@@ -79,6 +79,14 @@ com contrastes medidos. Nenhum componente muda. A classe vai no `<html>`:
 na chave `theme`), o script inline do `index.html` aplica antes do React montar,
 e `ThemeToggle.tsx` é o botão. `color-scheme: dark` escurece os controles
 nativos (data, scrollbar). Ao criar cor nova, defina em `:root` **e** em `.dark`.
+
+Dentro do Painel Benenutri (iframe) o tema anda junto nos dois sentidos, e o
+kit já faz isso: o script inline grava o `?tema=dark|light` do endereço e a
+origem do painel (`sessionStorage`, chave `painel-origem`); `escutarPainel()`
+(chamado pelo `ThemeToggle`; chame uma vez no `main.tsx` se a tela de login
+precisar seguir o painel) aplica o `postMessage({ tipo: 'mitra-tema', tema })`
+que vem do painel, e `setTheme`/`toggleTheme` devolvem a mesma mensagem quando
+a troca nasce no sistema. Rota `/sso`: redirecione para `manterTema(destino)`.
 
 ## Ausências deliberadas (§1.4)
 

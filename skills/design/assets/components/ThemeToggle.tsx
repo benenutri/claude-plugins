@@ -9,18 +9,20 @@ import * as React from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { IconButton } from '@/components/page';
 import { cn } from '@/lib/utils';
-import { resolvedTheme, toggleTheme, watchSystemTheme } from '@/lib/theme';
+import { escutarPainel, resolvedTheme, toggleTheme, watchSystemTheme } from '@/lib/theme';
 
 export function ThemeToggle({ className }: { className?: string }) {
   const [escuro, setEscuro] = React.useState(() => resolvedTheme() === 'dark');
 
   React.useEffect(() => {
-    // Se o usuário deixou em 'system', o SO pode mudar com a página aberta.
-    const parar = watchSystemTheme();
+    // Se o usuário deixou em 'system', o SO pode mudar com a página aberta;
+    // dentro do Painel Benenutri, o painel manda o tema por postMessage.
+    const pararSO = watchSystemTheme();
+    const pararPainel = escutarPainel();
     const sync = () => setEscuro(document.documentElement.classList.contains('dark'));
     const observer = new MutationObserver(sync);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    return () => { parar(); observer.disconnect(); };
+    return () => { pararSO(); pararPainel(); observer.disconnect(); };
   }, []);
 
   return (
